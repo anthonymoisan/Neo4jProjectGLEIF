@@ -1,0 +1,9 @@
+Start_Node;End_Node;Relation_ShipeType
+A1;A11;Owner
+B2;B21;Owner
+B2;B22;Owner
+B22;B221;Owner
+B221;B2211;Owner
+B221;B2212;Owner
+B22;B222;Owner
+A11;A111;Owner
