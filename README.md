@@ -2,7 +2,7 @@
 
 L'objectif de ce projet est l'utilisation de Neo4j, base de données orientées Graph sur la consolidation des entités à travers le Global Legal Entity Identifier
 
-La GLEIF [lien](https://www.gleif.org) met à disposition le Répertoire mondial des LEI, la seule source mondiale en ligne de données de référence ouvertes, normalisées et de haute qualité sur les entités juridiques.
+La GLEIF [(cf. lien)](https://www.gleif.org) met à disposition le Répertoire mondial des LEI, la seule source mondiale en ligne de données de référence ouvertes, normalisées et de haute qualité sur les entités juridiques.
 
 ## Pour démarrer
 
@@ -20,7 +20,7 @@ Nous utilisons Github pour le versionning.
 
 ## Auteur
 
-**Anthony Moisan** **Leonard Péan**- *Initial work @04/12/2019* 
+**Anthony Moisan** & **Leonard Péan**- *Initial work @04/12/2019* 
 
 ## Licence
 
