@@ -1,0 +1,59 @@
+
+1) Permet de savoir le nombre d'entités légales actives
+
+MATCH (e:Entity)-[:ACTIVE]-(act) 
+WHERE act.name = "ACTIVE"
+RETURN count(e)
+
+
+
+2) Permet de savoir le nombre de pays distincts représentés dans les données avec le nombre d'entités légales associées
+
+2.1) On essaie de regarder les entités légales par pays
+
+MATCH (c:Country)-[:REGISTERED]-(e:Entity)
+RETURN distinct(c.name), count(e)
+
+2.2) On prend en compte le caractère encore actif de l'entité légale pour avoir un chiffre qui ne soit pas le fruit de l'historique mais la position réelle
+
+MATCH (c:Country)-[:REGISTERED]-(e:Entity)-[:ACTIVE]-(act)
+WHERE act.name = "ACTIVE"
+RETURN distinct(c.name), count(e)
+
+3) On représente le tableau de consolidation d'une entreprise par exemple AXA 
+
+3.1) Pour une société avoir son schéma de consolidation
+
+MATCH (e:Entity {name:"AXA"}),
+path = (e)-[:RELATIONSHIP*]-(subsdiary:Entity)
+RETURN extract(x IN nodes(path) | x.name),length(path) as depth ORDER BY depth ASC
+
+3.2) On prend en compte uniquement les entités légales actives et en les triant par niveau de profondeur par rapport à la société mère
+
+MATCH (e:Entity {name:"AXA"}),
+path = (e)-[:RELATIONSHIP*]-(subsidiary:Entity)-[:ACTIVE]-(act {name:"ACTIVE"}) 
+RETURN extract(x IN nodes(path) WHERE x.name <> "ACTIVE" | x.name) as Nodes,length(path) as Depth ORDER BY Depth ASC
+
+3.3) On va ajouter une propriété pour savoir si une entité légale est une société mère (c'est à dire qu'elle n'a pas de RelationShip à l'amont)
+
+=== Tous les noeuds qui ont des relations ne sont pas des parents
+MATCH (e:Entity)<-[RELATIONSHIP]-()
+	SET e.isParent = FALSE
+RETURN e
+
+=== Par conséquent les autres noeuds sont les sociétés mères
+MATCH (e:Entity)
+WHERE not exists(e.isParent)
+SET e.isParent = TRUE
+return e
+
+=== Permet de calculer pour la France les schémas consolidés pour l'ensemble des sociétés mères vis-à-vis de ses filiales
+MATCH (c:Country {name:"FR"})-[:REGISTERED]-(e:Entity {isParent:TRUE})-[:ACTIVE]-(act{name:"ACTIVE"}),
+path = (e)-[:RELATIONSHIP*]-(subsidiary:Entity)-[:ACTIVE]-(act{name:"ACTIVE"})
+return e.name as Holding, subsidiary.name as Subsidiary, length(path) as Depth ORDER BY Depth DESC
+
+3.4) Par exemple, Bercy pourrait vouloir regarder les sociétés qui ont une filiale en France et qui ont des filiales dans des paradis fiscaux
+
+MATCH (c:Country {name:"FR"})-[:REGISTERED]-(e:Entity {isParent:TRUE})-[:ACTIVE]-(act{name:"ACTIVE"}),
+path = (e)-[:RELATIONSHIP*]-(subsidiary:Entity)-[:REGISTERED]-(cSubsidiary:Country) WHERE cSubsidiary.name in ["LU", "MA"]
+return e.name as Entity, subsidiary.name as Subsidiary, length(path) as Depth
