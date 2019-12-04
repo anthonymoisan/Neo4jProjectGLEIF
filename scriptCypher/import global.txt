@@ -13,9 +13,7 @@ USING PERIODIC COMMIT 500
 LOAD CSV WITH HEADERS FROM 'file:///Niveau1_Small.csv' 
 AS ligne FIELDTERMINATOR ';' 
 
-   MERGE (e:Entity {code_LEI: ligne.Code_LEI})
-   SET e.name = ligne.Legal_Name
-   SET e.last_update = apoc.date.format(apoc.date.parse(ligne.Last_Update_Date, 'ms', 'dd/MM/yyyy'))
+   MERGE (e:Entity {code_LEI: ligne.Code_LEI, name : ligne.Legal_Name, last_update : apoc.date.format(apoc.date.parse(ligne.Last_Update_Date, 'ms', 'yyyy-MM-dd'))})
 
    MERGE (act:Active {name:ligne.Status_Actif})
 
